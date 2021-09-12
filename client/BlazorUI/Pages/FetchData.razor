@@ -1,0 +1,531 @@
+﻿@page "/"
+@page "/fetchdata"
+
+@using Radzen;
+@using DM;
+@using System.Collections.Generic;
+@using System.Threading;
+@using System.Threading.Tasks;
+@using NLog;
+@using Force.DeepCloner;
+@using Client;
+@using Microsoft.AspNetCore.Components.Web
+@inject Radzen.DialogService DialogService
+@inject IJSRuntime JSRuntime
+
+
+<div>
+    <div style="display:flex">
+        <Radzen.Blazor.RadzenDialog />
+        <Radzen.Blazor.RadzenNotification />
+        <div style="float:left">
+            <Radzen.Blazor.RadzenAccordion>
+                <Items>
+                    <Radzen.Blazor.RadzenAccordionItem Text="Header" Style="font-size: 24px">
+                        <p style="white-space: pre-line;font-size:24px">@header</p>                        
+                    </Radzen.Blazor.RadzenAccordionItem>
+                </Items>
+            </Radzen.Blazor.RadzenAccordion>
+        </div>
+        <div style="margin-left: auto;font-size: 24px;font-weight: bold;display: flex;flex-direction:row">
+            <p>Interaction count: @Originator.Interaction.InteractionCnt</p>            
+            <p style="color:DodgerBlue;font-size:24px" title="Structure count">&nbsp(@Originator.Interaction.StructureCnt)</p>            
+        </div>        
+    </div>
+    <div style="display: flex">
+        <div style="position: relative;width:50%; margin: 2px">
+            <textarea @bind="init_query" spellcheck="false" style="width:100%; height:260px;font-size:24px;overflow:hidden;word-wrap:break-word"></textarea>
+            <div style="position: absolute; top: 0; right: 0px; margin: 5px; z-index: 100;">
+                <MatBlazor.MatTooltip Tooltip="config" style="font-size: 13px;">
+                    <MatBlazor.MatIconButton RefBack="@context" Style="color: blue; outline: none;" Icon="settings_suggest" OnClick="@ShowConfig">
+
+                    </MatBlazor.MatIconButton>
+                </MatBlazor.MatTooltip>                
+                <MatBlazor.MatTooltip Tooltip="init" style="font-size: 13px;">
+                    <MatBlazor.MatIconButton RefBack="@context" Style="color: limegreen; outline: none;" Icon="home" OnClick="@RunOnInitClick">
+
+                    </MatBlazor.MatIconButton>
+                </MatBlazor.MatTooltip>
+            </div>
+        </div>
+        <div style="position: relative;width:50%;margin:2px">
+            <div>
+                <textarea @bind="query" spellcheck="false" style="width:100%; height:260px;font-size:24px;overflow:hidden;word-wrap:break-word">@query</textarea>
+            </div>
+            <div style="position: absolute; top: 0; right: 0; margin: 5px; z-index: 100;">
+                <MatBlazor.MatTooltip Tooltip="undo" style="font-size: 13px;">
+                    <MatBlazor.MatIconButton RefBack="@context" Icon="undo" Style="font-size:large;outline: none;color: purple" OnClick="@RunOnUndoClick">
+
+
+                    </MatBlazor.MatIconButton>
+                </MatBlazor.MatTooltip>
+                <MatBlazor.MatTooltip Tooltip="stop" style="font-size: 13px;">
+                    <MatBlazor.MatIconButton RefBack="@context" Icon="stop" Style="font-size:large;outline: none;color: salmon" OnClick="@RunOnStopClick">
+
+
+                    </MatBlazor.MatIconButton>
+                </MatBlazor.MatTooltip>
+                <MatBlazor.MatTooltip Tooltip="table" style="font-size: 13px;">
+                    <MatBlazor.MatIconButton RefBack="@context" Icon="table_view" Style="font-size:large;outline: none;color: black" OnClick="@ShowTableFacade">
+
+
+                    </MatBlazor.MatIconButton>
+                </MatBlazor.MatTooltip>
+                <MatBlazor.MatTooltip Tooltip="get next structure" style="font-size: 13px;">
+            <MatBlazor.MatIconButton RefBack="@context" Icon="skip_next" Style="font-size:large;outline: none;color: blue" OnClick="@RunOnGetNextSkipClick">
+
+            </MatBlazor.MatIconButton>
+        </MatBlazor.MatTooltip>
+                <MatBlazor.MatTooltip Tooltip="get next" style="font-size: 13px;">
+                    <MatBlazor.MatIconButton RefBack="@context" Icon="play_circle_filled" Style="color: limegreen; outline: none" OnClick="@RunOnGetNextClick">
+
+                    </MatBlazor.MatIconButton>
+                </MatBlazor.MatTooltip>
+            </div>
+            <div id="spinner" class="spinner" style="position: absolute; top:150px ;left: -38px; visibility:hidden;">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
+        </div>
+    </div>
+    <div style="overflow:auto;">
+        <table class="table" style="font-size:24px">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>original_element</th>
+                    <th>proposed_element</th>
+                    <th>assignment_example</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var triple in triples)
+                {
+                    if (triple.Subject.IsDisplayed)
+                    {                        
+                        <tr>
+                            <td><Radzen.Blazor.RadzenCheckBox TriState="true" TValue="bool?" Disabled="triple.Subject.IsFeedbackFixed == true"  @bind-Value="triple.Subject.IsFeedbackUI" Change=@(args => OnChangeCB(args, triple.Subject,triple.Subject.Anchor, triple.Subject.GetElement(), triple.Subject.GetAssignment())) /></td>
+                            <td>@triple.Subject.Anchor</td>
+                            <td>@triple.Subject.GetElement()</td>
+                            <td>@triple.Subject.GetAssignment()</td>
+                        </tr>
+                    }
+                    if (triple.Predicate.IsDisplayed)
+                    {
+                        <tr>
+                            <td><Radzen.Blazor.RadzenCheckBox TriState="true" TValue="bool?" Disabled="triple.Predicate.IsFeedbackFixed == true" @bind-Value="triple.Predicate.IsFeedbackUI" Change=@(args => OnChangeCB(args, triple.Predicate, triple.Predicate.Anchor, triple.Predicate.GetElement(), triple.Predicate.GetAssignment())) /></td>
+                            <td>@triple.Predicate.Anchor</td>
+                            <td>@triple.Predicate.GetElement()</td>
+                            <td>@triple.Predicate.GetAssignment()</td>
+                        </tr>
+                    }
+                    if (triple.Object.IsDisplayed)
+                    {
+                        <tr>
+                            <td><Radzen.Blazor.RadzenCheckBox TriState="true" TValue="bool?" Disabled="triple.Object.IsFeedbackFixed == true" @bind-Value="triple.Object.IsFeedbackUI" Change=@(args => OnChangeCB(args, triple.Object, triple.Object.Anchor, triple.Object.GetElement(), triple.Object.GetAssignment())) /></td>
+                            <td>@triple.Object.Anchor</td>
+                            <td>@triple.Object.GetElement()</td>
+                            <td>@triple.Object.GetAssignment()</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+
+    private static NLog.Logger logger = LogManager.GetCurrentClassLogger();
+
+    private List<Triple> triples = new List<Triple>();
+
+    public string JenaLimit { get; set; } = "10000";
+
+    public string ESLimitEntities { get; set; } = "25";
+
+    public string ESLimitLiterals { get; set; } = "25";
+
+    public bool IsEditDistance { get; set; } = true;
+
+    public string QueryTimeout { get; set; } = "300";
+
+    private string header = Common.Utils.GetHeader();
+
+    private CancellationTokenSource tokenSource = new CancellationTokenSource();
+
+    Thread thread = null;
+
+    private string query = "";
+
+    bool dialogIsOpen = false;
+
+    public Candidate Candidate;
+
+    private string init_query = Common.Utils.DefaultQuery;
+
+    public bool ShowSpinner { get; set; } = false;
+
+    public Originator Originator { get; set; }
+
+    public Caretaker Caretaker { get; set; }
+
+    public String Error { get; set; }
+
+    public String ErrorDetail { get; set; }
+
+    public Guid Guid { get; set; }
+
+    public bool IsRunning { get; set; } = false;
+
+    public IDictionary<string,List<string>> Results { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Common.Utils.IsLog = false;
+        Init();
+    }
+
+
+    private void Init()
+    {
+        query = "";
+        triples.Clear();
+        Candidate = null;
+        try
+        {
+            Originator = new Originator(init_query);
+        }
+        catch (Exception ex)
+        {
+            Error = "Query is invalid, please correct it!";
+            ErrorDetail = ex.ToString();
+            ShowError();
+            return;
+        }
+
+        Caretaker = new Caretaker(Originator);
+    }
+
+    public void RunOnStopClick(MouseEventArgs e)
+    {
+        CancellationToken token = tokenSource.Token;
+        tokenSource.Cancel();
+    }
+
+    public async void ShowTableFacade()
+    {
+        if (!String.IsNullOrEmpty(query))
+        {
+            Results = await GetResults.Send(Candidate);
+            ShowTable();
+        }
+        else
+        {
+            Error = "No query";
+            ErrorDetail = "";
+            ShowError();
+        }
+    }
+
+
+    public async Task /*void*/ GetNext(bool isSkip, Guid guid)
+    {
+        Caretaker.Backup();
+
+        int number;
+        bool success;
+        success = Int32.TryParse(ESLimitEntities, out number);
+        if (success)
+        {
+            Originator.Interaction.ESLimitEntities = number;
+        }
+        else
+        {
+            Originator.Interaction.ESLimitEntities = null;
+        }
+
+        success = Int32.TryParse(ESLimitLiterals, out number);
+        if (success)
+        {
+            Originator.Interaction.ESLimitLiterals = number;
+        }
+        else
+        {
+            Originator.Interaction.ESLimitLiterals = null;
+        }
+
+
+
+        success = Int32.TryParse(JenaLimit, out number);
+        if (success)
+        {
+            Originator.Interaction.JenaLimit = number;
+        }
+        else
+        {
+            Originator.Interaction.JenaLimit = null;
+        }
+
+        success = Int32.TryParse(QueryTimeout, out number);
+        if (success)
+        {
+            Originator.Interaction.QueryTimeout = number;
+        }
+        else
+        {
+            Originator.Interaction.QueryTimeout = null;
+        }
+
+        Originator.Interaction.IsEditDistance = IsEditDistance;
+
+
+        try
+        {
+            var inner_guid = Guid.DeepClone();
+            await Originator.GetNext(isSkip, tokenSource.Token, inner_guid);
+        }
+        catch(SparqlitException ex)
+        {
+            if (this.Guid.Equals(ex.Guid))
+            {
+                Error = ex.Error;
+                ErrorDetail = ex.ErrorDetail;
+                ShowError();
+                RunUndo();
+            }
+            return;
+        }
+        
+        triples = Originator.Interaction.Candidate.Triples;
+        Candidate = Originator.Interaction.Candidate;
+        query = Originator.Interaction.Candidate.Query;
+
+    }
+
+
+    public void RunOnInitClick(MouseEventArgs e)
+    {
+        Common.Utils.IsLog = true;
+
+        Common.Utils.Log(String.Format("{0}", "********************************************************************************"));
+        Common.Utils.Log(String.Format("{0}", "user operation : init"));
+        Common.Utils.Log(String.Format("init query : {0}", init_query.Replace("  ", "").Replace("\n", " ")));
+        JSRuntime.InvokeAsync<object>("ShowSpinner");
+        Init();
+        JSRuntime.InvokeAsync<object>("HideSpinner");
+        IsRunning = false;
+        Guid = Guid.NewGuid();
+    }
+
+    public void RunOnThumbUpClick(MouseEventArgs e)
+    {
+        Common.Utils.Log(String.Format("{0}", "user operation : correct"));
+    }
+
+    public void RunOnThumbDownClick(MouseEventArgs e)
+    {
+        Common.Utils.Log(String.Format("{0}", "user operation : incorrect"));
+    }
+
+    public async Task /*void*/ RunOnGetNextClick(MouseEventArgs e)
+    {
+        if (IsRunning == false)
+        {
+            tokenSource.Dispose();
+            tokenSource = new CancellationTokenSource();
+            Common.Utils.Log(String.Format("user operation : get_next, interaction_cnt = {0}", Originator.Interaction.InteractionCnt));
+            JSRuntime.InvokeAsync<object>("ShowSpinner");
+            Guid = Guid.NewGuid();
+            var guid = Guid.DeepClone();
+            IsRunning = true;
+            await GetNext(false,guid);
+            if (guid.Equals(Guid))
+            {
+                IsRunning = false;
+                JSRuntime.InvokeAsync<object>("HideSpinner");
+            }
+        }
+
+    }
+
+    public async Task /*void*/ RunOnGetNextSkipClick(MouseEventArgs e)
+    {
+        if (IsRunning == false)
+        {
+            tokenSource.Dispose();
+            tokenSource = new CancellationTokenSource();
+            Common.Utils.Log(String.Format("user operation : get_next, interaction_cnt = {0}", Originator.Interaction.InteractionCnt));
+            JSRuntime.InvokeAsync<object>("ShowSpinner");
+            Guid = Guid.NewGuid();
+            var guid = Guid.DeepClone();
+            IsRunning = true;
+            await GetNext(true, guid);
+            if (guid.Equals(Guid))
+            {
+                IsRunning = false;
+                JSRuntime.InvokeAsync<object>("HideSpinner");
+            }
+        }
+
+    }
+
+
+    async Task ShowTable() => await DialogService.OpenAsync("Table", ds =>
+    @<div>
+        <div>
+            <div style="width:100%">
+                <span style="white-space: pre-line;">@query</span>
+            </div>
+            <div style="overflow:auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            @foreach (var item in Results.Keys)
+                            {
+                                <th>@item</th>
+                            }                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Results[Results.Keys.First()].Count; i++)
+                        {
+                            
+                                var lst = new List<string>();
+                                <tr>
+                                    @foreach (var key in Results.Keys)
+                                    {
+                                        <td>@Common.Utils.shorten(Results[key][i])</td>;
+                                    }
+                                    
+                                </tr>
+                        }                        
+                    </tbody>
+                    </table>
+            </div>
+            <div class="col-md-12">
+                <Radzen.Blazor.RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="margin-bottom: 10px; width: 150px" />
+            </div>
+        </div>
+    </div>);
+
+    async Task ShowConfig() => await DialogService.OpenAsync("Config", ds =>
+    @<div>
+        <div>
+            <div>
+                <h3>LIMIT_ES_ENTITIES</h3>
+                <Radzen.Blazor.RadzenTextBox @bind-Value="@ESLimitEntities" Change='(args) => OnChange(args, "ESLimit")' />
+                <h3>LIMIT_ES_LITERALS</h3>
+                <Radzen.Blazor.RadzenTextBox @bind-Value="@ESLimitLiterals" Change='(args) => OnChange(args, "ESLimit")' />
+                <h3>LINIT_JENA</h3>
+                <Radzen.Blazor.RadzenTextBox @bind-Value="JenaLimit" Change='(args) => OnChange(args, "JenaLimit")' />
+                <h3>QUERY_TIMEOUT (Seconds)</h3>
+                <Radzen.Blazor.RadzenTextBox @bind-Value="QueryTimeout" Change='(args) => OnChange(args, "QueryTimeout")' />
+                <h3>USE_EDIT_DISTANCE</h3>
+                <Radzen.Blazor.RadzenCheckBox @bind-Value=@IsEditDistance TValue="bool" Change='(args) => OnBoolChange(args, "IsEditDistance")' />
+            </div>
+            <div class="col-md-12">
+                <Radzen.Blazor.RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="margin-bottom: 10px; width: 150px" />
+            </div>
+        </div>
+    </div>);
+
+
+
+    async Task ShowError() => await DialogService.OpenAsync("Information", ds =>
+    @<div>
+         <div>
+             <div>
+                 <b>@Error</b>
+             </div>
+             <div>
+                 <b>Details :</b>
+             </div>
+             <div>
+                 @ErrorDetail
+             </div>
+             <div class="col-md-12">
+                 <Radzen.Blazor.RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="margin-bottom: 10px; width: 150px" />
+             </div>
+         </div>
+    </div>);
+
+
+
+
+    public void RunOnUndoClick(MouseEventArgs e)
+    {
+        JSRuntime.InvokeAsync<object>("HideSpinner");
+        Guid = Guid.NewGuid();
+        IsRunning = false;
+        RunUndo();
+    }
+
+    public void RunUndo()
+    {
+        Common.Utils.Log(String.Format("user operation : undo, interaction_cnt = {0}", Originator.Interaction.InteractionCnt - 1));
+        Caretaker.Undo();
+        if (Originator.Interaction.Candidate == null)
+        {
+            Init();
+        }
+        else
+        {
+            triples = Originator.Interaction.Candidate.Triples;
+            Candidate = Originator.Interaction.Candidate;
+            query = Originator.Interaction.Candidate.Query;
+        }
+    }
+
+    void OnBoolChange(bool value, string name)
+    {
+        if(name.Equals("IsEditDistance"))
+        {
+            if(value == true)
+            {
+                ESLimitEntities = "25";
+            }
+            else
+            {
+                ESLimitEntities = "50";
+            }
+
+        }
+
+    }
+
+    void OnChange(string value, string name)
+    {
+        if (Common.Utils.IsLog == false)
+        {
+            Common.Utils.IsLog = true;
+            Common.Utils.Log(String.Format("configuration : name = {0}, value = {1}", name, value));
+            Common.Utils.IsLog = false;
+        }
+        else
+        {
+            Common.Utils.Log(String.Format("configuration : name = {0}, value = {1}", name, value));
+        }
+    }
+
+    void OnChangeCB(bool? value, Entity entity, string original_elem, string proposed_element, string assignment_example)
+    {
+        bool? b = true;
+        if (value == null)
+        {
+            b = false;
+        }
+        if (value == false)
+        {
+            b = null;
+        }
+        Common.Utils.Log(String.Format("user operation : cb click, value = {0}, original_elem = {1}, proposed_element = {2}, assignment_example = {3}",
+                        b,
+                        original_elem,
+                        proposed_element,
+                        assignment_example));        
+    }
+}

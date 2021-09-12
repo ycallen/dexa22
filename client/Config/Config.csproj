@@ -1,0 +1,85 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="4.7.6" />
+    <PackageReference Include="YamlDotNet" Version="8.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Yaml\qald9_input_dbpedia\medium\17.GermanMarriedToMonarch.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\18.Orginisation1950.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\22.HighestDensityUSAState.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\24.BandleaderTrumpeter.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\25.StatesUtahTimezone.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\29 - Copy.MuseumsLondon.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\29.MuseumsLondon.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\31.AtlantaFalcons.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\42.NonProfitSwissOrginizations.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\47.VolacanosJapan.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9_input_dbpedia\medium\8.AirChinaServes.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\18.Orginisation1950.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\29 - Copy.MuseumsLondon.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\29.MuseumsLondon.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\31.AtlantaFalcons.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\47.VolacanosJapan.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\42.NonProfitSwissOrginizations.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\25.StatesUtahTimezone.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\17.GermanMarriedToMonarch.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\24.BandleaderTrumpeter.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\22.HighestDensityUSAState.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+    <None Update="Yaml\qald9\medium\8.AirChinaServes.yaml">
+      <CopyToOutputDirectory>Air</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /E /I /Y  $(SolutionDir)Config\Yaml $(TargetDir)\Yaml" />
+  </Target>
+
+</Project>
