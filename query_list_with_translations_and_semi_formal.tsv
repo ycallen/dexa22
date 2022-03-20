@@ -1,0 +1,864 @@
+id	Natural Language Question (QALD-9)	Natural Language w/o aggregation or numeric operations	Semi-formal Query (manual)	Dbpedia Formal Query (QALD-9)	YAGO Formal Query (manually verified)	gAnswer Formal Query
+1	List all boardgames by GMT.	List all boardgames by GMT.	"SELECT ?x
+WHERE
+{
+   ?x madeBy GMT  .
+}"	"SELECT ?uri 
+WHERE 
+{ 
+	?uri dbo:publisher res:GMT_Games 
+}"	No translation was found (manually)	Not found
+2	Who developed Skype?	Who developed Skype?	"SELECT ?x
+WHERE
+{
+  ?x developer skype      
+}"	"SELECT ?x
+WHERE 
+{
+   dbr:Skype dbo:developer ?x.
+}  
+"	"SELECT ?x
+WHERE 
+{
+  ?x <created> <Skype>
+}"	"select DISTINCT ?Who
+where 
+{ 
+ <Skype> <developer> ?Who. 
+}"
+3	Which people were born in Heraklion?	Which people were born in Heraklion?	"SELECT ?x
+WHERE
+{
+  ?x born heraklion 
+}"	"SELECT ?x
+WHERE 
+{       
+   ?x dbo:birthPlace dbr:Heraklion .
+}"	"SELECT ?x
+WHERE 
+{
+  ?x <wasBornIn> <Heraklion>
+}"	"select DISTINCT ?people  
+where 
+{ 
+ ?people <birthPlace> <Heraklion>. 
+}"
+4	In which U.S. state is Area 51 located?	In which U.S. state is Area 51 located?	"SELECT ?x
+WHERE
+{
+  area51 located ?x 
+}"	"SELECT ?x
+WHERE 
+{
+   dbr:Area_51 dbo:location ?x . 
+   ?x dbo:country dbr:United_States.
+}"	"SELECT ?x
+WHERE 
+{
+  <Area_51> <isLocatedIn> ?x
+}"	"select DISTINCT ?US_state  
+where 
+{ 
+ ?US_state <type> <yago:StatesOfTheUnitedStates>. 
+}"
+5	Who is the mayor of New York City?	Who is the mayor of New York City?	"SELECT ?x
+WHERE
+{
+  NewYorkCity mayor ?x 
+}"	"SELECT ?x
+WHERE 
+{
+   dbr:New_York_City dbo:leaderName ?x
+}"	"SELECT ?x
+WHERE 
+{
+  ?x <isLeaderOf> <New_York_City>
+}"	Not found
+6	Which countries have places with more than two caves?	Which countries have places with caves?	"SELECT ?z
+WHERE
+{
+  ?z country ?x  . 
+  ?c located ?z  .
+  ?b located ?c  .
+  ?b type cave .
+}"	"SELECT ?y
+WHERE 
+{
+   ?x rdf:type dbo:Cave .
+   ?x dbo:location ?y . 
+   ?y rdf:type dbo:Country
+}"	"SELECT ?x
+WHERE 
+{
+  ?z <infobox/en/country> ?x .
+  ?c <isLocatedIn> ?z .
+  ?b <isLocatedIn> ?c .
+  ?b rdf:type <wikicat_Caves>
+}"	Not found
+7	Where did Abraham Lincoln die?	Where did Abraham Lincoln die?	"SELECT ?x
+WHERE
+{
+  Abraham_Lincoln died ?x
+}"	"SELECT ?x
+WHERE 
+{        
+   dbr:Abraham_Lincoln dbo:deathPlace ?x.
+}"	"SELECT ?x ?y
+WHERE 
+{        
+  <Abraham_Lincoln> <diedIn> ?x .
+  ?x <isLocatedIn>?y
+}"	"select DISTINCT ?Where  
+where 
+{ 
+ ?Where <type> <Location>. 
+ <Abraham_Lincoln> <deathPlace> ?Where. 
+}"
+8	Which airports does Air China serve?	Which airports does Air China serve?	"SELECT ?x
+WHERE
+{
+  air_china lands ?x
+}"	"SELECT ?x
+WHERE
+{        
+   dbr:Air_China dbo:targetAirport ?x
+}"	"SELECT ?x
+WHERE
+{        
+  <Air_China> <infobox/en/focuscities> ?x
+}"	"select DISTINCT ?airports
+where 
+{ 
+ ?airports <type> <Airport>. 
+ <Air_China> <hubAirport> ?airports. 
+}"
+9	Give me all actors starring in movies directed by William Shatner.	Give me all actors starring in movies directed by William Shatner.	"SELECT ?x ?y
+WHERE
+{       
+   ?y direct William_Shatner  .       
+   ?x  act ?y .      
+}"	"SELECT ?x ?y
+WHERE 
+{  
+   ?x dbo:director dbr:William_Shatner .        
+   ?x dbo:starring ?y .              
+}"	"SELECT ?x ?y
+WHERE 
+{               
+  <William_Shatner> <directed> ?x .
+  ?y <actedIn> ?x .
+}"	"select DISTINCT ?films ?actors  
+where 
+{ 
+	?films	<type>	<Film>. 
+	?films	<director>	<William_Shatner>. 
+	?films	<starring>	?actors. 
+}"
+10	What are the official languages of the Philippines?	What are the official languages of the Philippines?	"SELECT ?x
+WHERE
+{
+   Philippines langauge ?x
+}  "	"SELECT ?x
+WHERE 
+{        
+   dbr:Philippines dbo:officialLanguage ?x
+}"	"SELECT ?x
+WHERE 
+{        
+  <Philippines> <hasOfficialLanguage> ?x
+}"	Not found
+11	Give me all Danish films.	Give me all Danish films.	"
+SELECT ?x
+WHERE
+{
+   ?x type danish_film
+}"	"SELECT ?x
+WHERE 
+{        
+  ?x rdf:type dbo:Film . 
+  ?x dbo:country dbr:Denmark
+}"	"SELECT ?x
+WHERE 
+{        
+  ?x rdf:type <wikicat_Danish_films>
+}"	Not found
+12	Which movies starring Brad Pitt were directed by Guy Ritchie?	Which movies starring Brad Pitt were directed by Guy Ritchie?	"SELECT ?x
+WHERE
+{
+   Brad_Pitt act ?x .
+   Guy_Ritchie direct ?x
+}"	"SELECT ?x
+    WHERE 
+    {        
+       ?x dbo:starring dbr:Brad_Pitt .
+       ?x dbo:director dbr:Guy_Ritchie
+    }"	"SELECT ?x
+WHERE 
+{        
+  <Brad_Pitt> <actedIn> ?x .
+  <Guy_Ritchie> <directed> ?x
+}"	"select DISTINCT ?films  
+where 
+{ 
+ ?films <type> <Film>. 
+ ?films <director> <Guy_Ritchie>. 
+ ?films <starring> <Brad_Pitt>. 
+}"
+13	Give me the grandchildren of Bruce Lee.	Give me the grandchildren of Bruce Lee.	"SELECT ?x ?y
+WHERE
+{
+  Bruce_Lee child ?x .
+  ?x child ?y 
+}"	"SELECT ?x ?y
+WHERE 
+{
+   dbr:Bruce_Lee dbo:child ?x .
+   ?x dbp:children ?y
+}"	"SELECT ?x ?y
+WHERE 
+{
+  <Bruce_Lee> <hasChild> ?x .
+  ?x <infobox/en/children> ?y
+}"	Not found
+14	Which other weapons did the designer of the Uzi develop?	Which other weapons did the designer of the Uzi develop?	"SELECT ?x ?y
+WHERE
+{
+  ?x design uzi .
+  ?x design ?y
+}"	"SELECT ?x ?y
+WHERE 
+{
+ dbr:Uzi dbp:designer ?x .
+ ?y dbp:designer ?x .                
+}"	"SELECT ?x ?y
+WHERE 
+{        
+  <Uzi> <infobox/en/designer> ?x .
+  ?y <infobox/en/designer> ?x
+}"	"select DISTINCT ?weapons ?designer  
+where 
+{ 
+ ?weapons <type> <Weapon>. 
+ <Uzi> <designer> ?designer. 
+ ?weapons <designer> ?designer. 
+}"
+15	Who is the owner of Universal Studios?	Who is the owner of Universal Studios?	"SELECT ?x
+WHERE
+{
+  Universal_Studios owner ?x
+}"	"SELECT ?x
+WHERE 
+{        
+   dbr:Universal_Studios dbo:owner ?x
+}"	"SELECT ?x
+WHERE 
+{        
+  <Universal_Studios_Florida> <infobox/en/owner> ?x
+}"	"select DISTINCT ?owner  
+where 
+{ 
+ <Universal_Studios> <owner> ?owner. 
+}"
+16	Which state of the USA has the highest population density?	Which state of the USA has the highest population density?	"SELECT ?x
+    WHERE
+    {
+      ?x populationDensity ?y  .
+      ?x type usa_states  . 
+    }"	"PREFIX yago: <http://dbpedia.org/class/yago/> 
+PREFIX dbp: <http://dbpedia.org/property/> 
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+SELECT DISTINCT ?uri WHERE 
+{ 
+  ?uri rdf:type yago:WikicatStatesOfTheUnitedStates .
+  ?uri dbp:densityrank ?rank 
+} 
+ORDER BY ASC(?rank) 
+LIMIT 1"	No translation was found (manually)	"select DISTINCT ?state_of_the_USA ?density  
+where 
+{ 
+  ?state_of_the_USA	<populationDensity>	?density. 
+} 
+LIMIT 1"
+17	Which monarchs were married to a German?	Which monarchs were married to a German?	"SELECT ?x
+WHERE
+{
+  ?x type monarch .
+  ?y married ?x .
+  ?y citizen germany
+}"	"SELECT ?uri ?spouse ?p
+WHERE
+{        
+   ?uri rdf:type dbo:Monarch .
+   ?uri dbo:spouse ?spouse .
+   ?spouse dbo:birthPlace ?p . 
+   ?p dbo:country dbr:Germany  
+} "	"SELECT ?x ?y
+WHERE
+{        
+   ?x <infobox/en/type> ""monarch""@en .
+   ?y <isMarriedTo> ?x .
+   ?y <isCitizenOf> <Germany>
+}"	Not found
+18	Which organizations were founded in 1950?	Which organizations were founded in 1950?	"Select ?x
+{
+ ?x founded 1950 .
+ ?x type organization
+}"	"SELECT ?x
+WHERE
+{  
+   ?x dbo:formationYear ""1950""^^xsd:gYear .
+   ?x rdf:type dbo:Organisation .       
+}"	"Select ?x ?y
+{
+  ?x <infobox/en/founded> ""1950""@en .
+  ?x rdf:type ?y .
+  ?y rdfs:label ""organisation""@eng
+}"	"select DISTINCT ?organizations  
+where 
+{ 
+ ?organizations <type> <Organization>. 
+}"
+19	Who created the comic Captain America?	Who created the comic Captain America?	"
+SELECT ?x
+WHERE
+{
+   ?x created  captain_america_comic
+}"	"
+SELECT ?x
+WHERE 
+{        
+   dbr:Captain_America dbo:creator ?x
+}"	"SELECT ?x
+WHERE 
+{        
+  ?x <created> <Captain_America_(comic_book)>
+}"	"select DISTINCT ?Who  
+where 
+{ 
+ ?Who <creator> <Captain_America>. 
+}"
+20	Give me the Apollo 14 astronauts.	Give me the Apollo 14 astronauts.	"SELECT ?x
+WHERE
+{
+   ?x crewmember Apollo_14 .
+}"	"SELECT ?x
+WHERE 
+{        
+   ?x dbo:mission dbr:Apollo_14
+}"	"SELECT ?x
+WHERE 
+{        
+  <Apollo_14> <infobox/en/crewmembers> ?x
+}"	"select DISTINCT ?astronauts  
+where 
+{ 
+ ?astronauts <type> <Astronaut>. 
+}"
+21	Who wrote the book The pillars of the Earth?	Who wrote the book The pillars of the Earth?	"SELECT ?x
+WHERE
+{
+   ?x created pillars_of_the_earth
+}"	"SELECT ?x
+WHERE 
+{        
+   dbr:The_Pillars_of_the_Earth dbo:author ?x
+}"	"SELECT ?x
+WHERE 
+{        
+  ?x <created> <The_Pillars_of_the_Earth>
+}"	Not found
+22	Which state of the United States of America has the highest density?	Which state of the United States of America has the highest density?	"SELECT ?x
+WHERE
+{
+ ?x density ?y .
+ ?x type state_united_states 
+} "	"SELECT ?uri ?density
+WHERE 
+{
+ ?uri dbp:densityrank ?density
+}"	"SELECT ?x ?y
+WHERE
+{        
+  ?x <infobox/en/density> ?y .
+  ?x rdf:type <wikicat_United_States>
+}"	Not found
+23	Which spaceflights were launched from Baikonur?	Which spaceflights were launched from Baikonur?	"SELECT ?x
+WHERE
+{
+  ?x launch Baikonur
+}"	"SELECT ?x
+WHERE 
+{
+   ?x dbp:launchPad dbr:Baikonur_Cosmodrome
+}"	"SELECT ?x
+WHERE 
+{
+  ?x <infobox/en/launchsite> ""[[Baikonur Cosmodrome]]""@en
+}"	"select DISTINCT ?spaceflights  
+where 
+{ 
+ ?spaceflights <launchPad> <Baikonur_Cosmodrome>. 
+}"
+24	Give me a list of all trumpet players that were bandleaders.	Give me a list of all trumpet players that were bandleaders.	"SELECT ?x
+WHERE
+{
+  ?x instrument Trumpet .  
+  ?x type bandleader
+}"	"SELECT ?x
+WHERE
+{  
+   ?x dbo:instrument dbr:Trumpet .
+   ?x dbo:occupation dbr:Bandleader        
+}"	"SELECT ?x
+WHERE
+{        
+  ?x <infobox/en/occupation> ""[[Bandleader]], [[trumpeter]]""@en . 
+  ?x <infobox/en/occupation> ""[[Bandleader]], [[trumpeter]]""@en 
+}"	Not found
+25	Which U.S. states are in the same timezone as Utah?	Which U.S. states are in the same timezone as Utah?	"SELECT ?x ?y
+WHERE
+{
+  utah timezone ?x .
+  ?y timezone ?x . 
+  ?y type us_state
+}"	"SELECT ?x
+WHERE
+{        
+   dbr:Utah dbp:timezone ?x .        
+   ?y dbp:timezone ?x .
+   ?y rdf:type yago:WikicatStatesOfTheUnitedStates 
+}"	"SELECT ?x ?y
+WHERE
+{        
+  <Utah> <infobox/en/timezone> ?x .
+  ?y <infobox/en/timezone> ?x .
+  ?y rdf:type <wikicat_United_States>
+}"	"select DISTINCT ?timezone ?US_states  
+where 
+{ 
+ <Utah> <timezone> ?timezone. 
+ ?US_states <timezone> ?timezone. 
+}"
+26	Which U.S. states possess gold minerals?	Which U.S. states possess gold minerals?	"SELECT ?x
+WHERE
+{ ?x type us_state
+  ?x mineral gold
+}"	"SELECT DISTINCT ?uri WHERE 
+{ ?uri rdf:type yago:WikicatStatesOfTheUnitedStates
+  ?uri dbp:mineral ?mineral 
+  FILTER regex(?mineral, \""gold\"", \""i\"") 
+}"	No translation was found (manually)	"select DISTINCT ?minerals ?US_states  where 
+{ ?minerals	<type>	<Mineral>. 
+  ?US_states	<mineral>	?minerals. 
+} 
+LIMIT 1"
+27	Who is the daughter of Ingrid Bergman married to?	Who is the daughter of Ingrid Bergman married to?	"SELECT ?x ?y
+WHERE
+{
+   Ingrid_Bergman child ?x .
+   ?x married ?y
+}"	"SELECT ?x ?y
+WHERE 
+{        
+   dbr:Ingrid_Bergman dbo:child ?x .
+   ?y dbo:spouse ?x
+}"	"SELECT ?x ?y
+WHERE 
+{        
+  <Ingrid_Bergman> <hasChild> ?x .
+  ?x <isMarriedTo> ?y
+}"	Not found
+28	How deep is Lake Placid?	How deep is Lake Placid?	"SELECT ?x
+WHERE
+{
+   Lake_Placid depth ?x
+}"	"
+SELECT ?x
+WHERE 
+{
+   dbr:Lake_Placid_(Texas) dbo:maximumDepth ?x
+}"	"SELECT ?x
+WHERE 
+{
+  <Lake_Placid_(New_York)> <infobox/en/depth> ?x
+}"	Not found
+29	Show me all museums in London.	Show me all museums in London.	"SELECT ?x
+WHERE
+{
+  ?x type museum .
+  ?x locatedIn London
+}"	"SELECT ?x
+WHERE
+{        
+ ?x rdf:type dbo:Museum . 
+ ?x dbo:location dbr:London
+}"	"SELECT ?x
+WHERE
+{        
+  ?x <infobox/en/type> ""museum""@en .
+  ?x <isLocatedIn> <London>
+}"	"select DISTINCT ?museums  
+where 
+{ 
+ ?museums <type> <Museum>. 
+ ?museums <location> <London>. 
+}"
+30	Which caves have more than 3 entrances?	What is the entrance count of each cave?	"SELECT ?x
+WHERE
+{
+  cave entrancecount ?y
+}"	"
+SELECT ?x ?y
+WHERE 
+{       
+  ?x dbp:entranceCount ?y
+}"	"SELECT ?x
+WHERE 
+{
+  <Cave_S> <infobox/en/entrancecount> ?x
+}"	"
+select DISTINCT ?caves 
+where 
+{ 
+ ?caves <type> <Cave>. 
+ ?caves <entranceCount> ?entrances. 
+} 
+GROUP BY ?caves
+HAVING (COUNT(?entrances) > 3) "
+31	Who is the tallest player of the Atlanta Falcons?	What are the heights of the Atlanta Falcons players?	"Select ?x ?y
+{
+ ?x type  AtlantaFalcons  .
+ ?x height ?y
+}"	"SELECT ?x ?y
+WHERE
+{        
+   ?x dbo:team dbr:Atlanta_Falcons .
+   ?x dbo:height ?y
+}"	"Select ?x ?y
+{
+  ?x rdf:type <wikicat_Atlanta_Falcons_players> .
+  ?x <infobox/en/heightft> ?y
+}"	"select DISTINCT ?player  
+where 
+{ 
+ <1975_Atlanta_Falcons_season> <player> ?player. 
+} 
+
+"
+32	What are the top-10 action role-playing video games according to IGN?	What are the ranks of action role-playing video games according to IGN?	"SELECT ?x ?y
+WHERE
+{
+?x type action_role_playing_game
+?x ign_rank ?y
+}"	"SELECT DISTINCT ?uri 
+WHERE 
+{ 
+?uri <http://purl.org/dc/terms/subject> <http://dbpedia.org/resource/Category:Action_role-playing_video_games>  .
+	?uri <http://dbpedia.org/property/ign> ?score 
+} 
+ORDER BY DESC(?score) 
+LIMIT 10"	No translation was found (manually)	Not found
+33	Give me all writers that won the Nobel Prize in literature.	Give me all writers that won the Nobel Prize in literature.	"SELECT ?x
+WHERE
+{
+   ?x won nobel_prize_literature .
+   ?x type writer
+}"	"SELECT ?x
+WHERE 
+{        
+  ?x dbo:award dbr:Nobel_Prize_in_Literature .
+  ?x rdf:type dbo:Writer
+}"	"SELECT ?x
+WHERE 
+{        
+  ?x <hasWonPrize> <Nobel_Prize_in_Literature> .
+  ?x rdf:type <wikicat_Writers>
+}"	Not found
+34	Show me all basketball players that are higher than 2 meters.	Show me the height of all basketball players.	"SELECT ?x ?y
+WHERE
+{
+ ?x type basketball_player .
+ ?x height ?y
+}"	"SELECT ?x ?y
+WHERE 
+{        
+   ?x rdf:type dbo:BasketballPlayer .
+   ?x dbo:height ?y
+}"	"SELECT ?x ?y
+WHERE 
+{        
+  ?x rdf:type <wikicat_Basketball_players> .
+  ?x <hasHeight> ?y
+}"	"select DISTINCT ?basketball_players  
+where 
+{ 
+ <72_Meters> <country> ?basketball_players. 
+}"
+35	When was the Statue of Liberty built?	When was the Statue of Liberty built?	"SELECT ?x
+WHERE
+{
+   Statue_of_Liberty built ?x
+}"	"SELECT ?x
+WHERE 
+{        
+   dbr:Statue_of_Liberty dbp:beginningDate ?x
+}"	"SELECT ?x
+WHERE 
+{        
+  <Statue_of_Liberty> <wasCreatedOnDate> ?x
+}"	"select DISTINCT ?When  
+where 
+{ 
+ <Statue_of_Liberty> <beginningDate> ?When. 
+}"
+36	Which states border Illinois?	Which states border Illinois?	"SELECT ?x
+WHERE
+{
+  Illinois bordering_states ?v
+}"	"SELECT ?x
+WHERE 
+{
+   dbr:Illinois dbp:borderingstates ?x
+}"	"SELECT ?x
+WHERE 
+{
+  <Illinois> <infobox/en/borderingstates> ?x
+}"	"select DISTINCT ?states  
+where 
+{ 
+ ?states <borderingstates> <Illinois>. 
+}"
+37	Who developed Minecraft?	Who developed Minecraft?	"SELECT ?x
+WHERE
+{
+   ?x developed Minecraft
+}"	"SELECT ?x
+WHERE 
+{        
+   dbr:Minecraft dbo:developer ?x
+}"	"SELECT ?x
+WHERE 
+{        
+  <Minecraft> <infobox/en/developer> ?x
+}"	"select DISTINCT ?Who  
+where 
+{ 
+ <Minecraft> <developer> ?Who. 
+}"
+38	Where did Hillel Slovak die?	Where did Hillel Slovak die?	"
+SELECT ?x
+WHERE
+{
+   Hillel_Slovak died ?x
+} "	"SELECT ?x
+WHERE 
+{        
+   dbr:Hillel_Slovak dbo:deathPlace ?x
+}"	"SELECT ?x
+WHERE 
+{        
+  <Hillel_Slovak> <diedIn> ?x
+}"	"select DISTINCT ?Where  
+where 
+{ 
+ ?Where <type> <Location>. 
+ <Hillel_Slovak> <deathPlace> ?Where. 
+}"
+39	What movies does Jesse Eisenberg play in?	What movies does Jesse Eisenberg play in?	"SELECT ?x
+WHERE
+{
+   Jesse_Eisenberg acted ?x
+}"	"SELECT ?x
+WHERE 
+{              
+   ?x dbo:starring dbr:Jesse_Eisenberg
+}"	"SELECT ?x
+WHERE 
+{        
+  <Jesse_Eisenberg> <actedIn> ?x
+}"	"select DISTINCT ?films  
+where 
+{ 
+ ?films <type> <Film>. 
+ ?films <starring> <Jesse_Eisenberg>. 
+}"
+40	Give all swimmers that were born in Moscow.	Give all swimmers that were born in Moscow.	"SELECT ?x
+WHERE
+{
+   ?x born moscow .
+   ?x type swimmer       
+}"	"SELECT ?x
+WHERE 
+{        
+   ?x dbo:birthPlace dbr:Moscow .
+   ?x rdf:type dbo:Swimmer .       
+}"	"SELECT ?x
+WHERE 
+{ 
+  ?x <wasBornIn> <Moscow> .
+  ?x rdf:type <wikicat_Swimmers> .      
+}"	"select DISTINCT ?swimmers  
+where 
+{ 
+ ?swimmers <type> <Swimmer>. 
+ ?swimmers <birthPlace> <Moscow>. 
+}"
+41	Give me all cosmonauts.	Give me all cosmonauts.	"SELECT ?x
+WHERE
+{
+   ?x type cosmonauts
+}
+"	"SELECT ?x
+WHERE 
+{        
+   ?x rdf:type dbo:Astronaut .
+   ?x dbo:nationality dbr:Russia
+}"	"SELECT ?x
+WHERE 
+{        
+  ?x <infobox/en/type> ""Cosmonaut""@en
+}"	Not found
+42	Give me all Swiss non-profit organizations.	Give me all Swiss non-profit organizations.	"SELECT ?x
+WHERE
+{
+  ?x located switzerland .
+  ?x type non_profit_organizations .
+  
+}"	"SELECT ?x
+WHERE
+{  
+ ?x dbo:location dbr:Switzerland . 
+ ?x dbo:type dbr:Nonprofit_organization .             
+}"	"SELECT ?x
+WHERE
+{  
+  ?x <isLocatedIn> <Switzerland> .
+  ?x rdf:type <wikicat_Non-profit_organizations> .       
+}"	Not found
+43	Which presidents were born in 1945?	Which presidents were born in 1945?	"SELECT ?x
+WHERE
+{
+ ?x type president .
+ ?x birthday 1945
+}"	"SELECT ?x
+WHERE 
+{
+   ?x rdf:type dbo:President .
+   ?x dbo:birthDate ""1945-1-1""^^xsd:date
+}"	"SELECT ?x
+WHERE 
+{
+  ?x <infobox/en/type> ""president""@en .
+  ?x <infobox/en/birthdate> ""1945""@en
+}"	"select DISTINCT ?presidents  
+where 
+{ 
+ ?presidents <type> <President>. 
+}"
+44	What kind of music did Lou Reed play?	What kind of music did Lou Reed play?	"Select ?x
+{
+ Lou_Reed music_kind ?x
+}"	"SELECT ?x
+WHERE 
+{
+  dbr:Lou_Reed dbo:genre ?x
+}"	"Select ?x
+{
+  <Lou_Reed> <infobox/en/genre> ?x
+}"	"select DISTINCT ?kind  
+where 
+{ 
+ <Music> <genre> ?kind. 
+ <Lou_Reed> <genre> ?kind. 
+}"
+45	Where do the Red Sox play?	Where do the Red Sox play?	"Select *
+{
+  RedSox location ?x
+}"	"SELECT ?x
+WHERE 
+{        
+   dbr:Boston_Red_Sox dbp:ballpark ?x
+}"	"Select ?x
+{
+  <Boston_Red_Sox> <infobox/en/ballpark> ?x
+}  "	"select DISTINCT ?Where  
+where 
+{ 
+ ?Where <type> <Location>. 
+ <Salem_Red_Sox> <ballpark> ?Where. 
+}"
+46	Show a list of soccer clubs that play in the Bundesliga.	Show a list of soccer clubs that play in the Bundesliga.	"Select *
+    {
+        ?x type  soccer_club . 
+        ?x  play Bundesliga .
+    }"	"Select ?x
+    {
+        dbr:FC_Bayern_Munich rdf:type dbo:SoccerClub .
+        dbr:FC_Bayern_Munich dbo:league dbr:Bundesliga
+    }"	No translation was found (manually)	Not found
+47	Which volcanos in Japan erupted since 2000?	Which volcanos in Japan erupted on which year?	"Select ?x ?y
+{
+  ?x type volcano .
+  ?x locatedIn japan .
+  ?x erupted ?y
+}"	"SELECT ?x ?y
+WHERE
+{        
+   ?x rdf:type dbo:Volcano . 
+   ?x dbo:locatedInArea dbr:Japan .
+   ?x dbo:eruptionYear ?y
+}"	"Select ?x ?y
+{
+  ?x rdf:type <wikicat_Volcanoes> .
+  ?x <isLocatedIn> <Japan> .
+  ?x <infobox/en/lasteruption> ?y
+}"	Not found
+48	Which bridges cross the Seine?	Which bridges cross the Seine?	"Select *
+{
+ ?x cross Seine .
+ ?x type bridge
+}"	"SELECT ?x
+WHERE 
+{
+   ?x dbo:crosses dbr:Seine .
+   ?x rdf:type dbo:Bridge .
+}"	"Select ?x
+{
+  ?x <infobox/en/crosses> ""[[Seine]]""@en .
+  ?x rdf:type <wikicat_Bridges>
+}"	"select DISTINCT ?bridges  
+where 
+{
+ ?bridges <type> <Bridge>. 
+ ?bridges <crosses> <Seine>. 
+}"
+49	What is the official color of the University of Oxford?	What is the official color of the University of Oxford?	"Select ?x
+{
+ UniversityOxford officialColor  ?x
+}"	"SELECT ?x
+WHERE 
+{        
+   dbr:University_of_Oxford dbo:officialSchoolColour ?x
+}"	"Select ?x
+{
+  <University_of_Oxford> <infobox/en/colours> ?x
+}"	"select DISTINCT ?color  
+where 
+{ 
+ ?color <colour> <University_of_Oxford>. 
+}"
+50	How many films did Hal Roach produce?	Which films did Hal Roach produce?	"Select ?x
+{
+ Hal_Roach produced ?x
+}"	"Select ?x
+{
+ ?x dbo:producer dbr:Hal_Roach
+}"	"Select ?x
+{
+  <Hal_Roach> <created> ?x
+}"	"select COUNT(DISTINCT ?films) 
+where 
+{ 
+ ?films <type> <Film>. 
+ ?films <producer> <Hal_Roach>. 
+}"
